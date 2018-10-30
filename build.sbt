@@ -89,6 +89,16 @@ lazy val `akka-persistence-mongo-casbah` = (project in file("casbah"))
   )
   .configs(Travis)
 
+lazy val `akka-persistence-mongo-scala-driver` = (project in file("scala-driver"))
+  .dependsOn(`akka-persistence-mongo-common` % "test->test;compile->compile")
+  .settings(commonSettings:_*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.lightbend.akka" %% "akka-stream-alpakka-mongodb" % "1.0-M1"  % "provided"
+    )
+  )
+  .configs(Travis)
+
 lazy val `akka-persistence-mongo-rxmongo` = (project in file("rxmongo"))
   .dependsOn(`akka-persistence-mongo-common` % "test->test;compile->compile")
   .settings(commonSettings:_*)
@@ -117,7 +127,7 @@ lazy val `akka-persistence-mongo-tools` = (project in file("tools"))
   .configs(Travis)
 
 lazy val `akka-persistence-mongo` = (project in file("."))
-  .aggregate(`akka-persistence-mongo-common`, `akka-persistence-mongo-casbah`, `akka-persistence-mongo-rxmongo`, `akka-persistence-mongo-tools`)
+  .aggregate(`akka-persistence-mongo-common`, `akka-persistence-mongo-casbah`, `akka-persistence-mongo-scala-driver`, `akka-persistence-mongo-rxmongo`, `akka-persistence-mongo-tools`)
   .settings(commonSettings:_*)
   .settings(
     packagedArtifacts in file(".") := Map.empty,
