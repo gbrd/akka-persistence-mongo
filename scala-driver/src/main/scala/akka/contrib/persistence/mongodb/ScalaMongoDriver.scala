@@ -69,11 +69,13 @@ class ScalaMongoDriver(system: ActorSystem, config: Config) extends MongoPersist
     collection
   }
 
-  override private[mongodb] def closeConnections(): Unit = ???
+  override private[mongodb] def closeConnections(): Unit = client.close()
 
-  override private[mongodb] def upgradeJournalIfNeeded(): Unit = ???
+  override private[mongodb] def upgradeJournalIfNeeded(): Unit = upgradeJournalIfNeeded("")
 
-  override private[mongodb] def upgradeJournalIfNeeded(persistenceId: String): Unit = ???
+  override private[mongodb] def upgradeJournalIfNeeded(persistenceId: String): Unit = {
+    //TODO
+  }
 
 
 }

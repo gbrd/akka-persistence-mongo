@@ -1,6 +1,9 @@
 package akka.contrib.persistence.mongodb
 
+import akka.actor.ActorSystem
 import akka.persistence.{AtomicWrite, PersistentRepr}
+import org.mongodb.scala.MongoCollection
+import org.mongodb.scala.bson.collection.immutable.Document
 
 import scala.collection.immutable
 import scala.concurrent.{ExecutionContext, Future}
@@ -9,20 +12,15 @@ import scala.collection.immutable.{Seq => ISeq}
 
 class ScalaDriverJournaller(driver: ScalaMongoDriver) extends MongoPersistenceJournallingApi {
 
+  private implicit val system: ActorSystem = driver.actorSystem
 
-  private[this] def doBatchAppend(writes: ISeq[AtomicWrite], collection: Future[BSONCollection])(implicit ec: ExecutionContext): Future[ISeq[Try[Unit]]] = {
-    val batch = writes.map(aw => Try(driver.serializeJournal(Atom[BSONDocument](aw, driver.useLegacySerialization))))
 
-    if (batch.forall(_.isSuccess)) {
-      val collected = batch.toStream.collect { case Success(doc) => doc }
-      collection.flatMap(_.bulkInsert(collected, ordered = true, writeConcern).map(_ => batch.map(_.map(_ => ()))))
-    } else {
-      Future.sequence(batch.map {
-        case Success(document: BSONDocument) =>
-          collection.flatMap(_.insert(document, writeConcern).map(writeResultToUnit))
-        case f: Failure[_] => Future.successful(Failure[Unit](f.exception))
-      })
-    }
+  private[this] def doBatchAppend(writes: ISeq[AtomicWrite], collection: Future[MongoCollection[Document]])(implicit ec: ExecutionContext): Future[ISeq[Try[Unit]]] = {
+
+
+    //val batch = writes.map(write => Try(driver.serializeJournal(Atom[Document](write, driver.useLegacySerialization))))
+    ???
+
   }
 
   override private[mongodb] def batchAppend(writes: immutable.Seq[AtomicWrite])(implicit ec: ExecutionContext): Future[ISeq[Try[Unit]]] = {
